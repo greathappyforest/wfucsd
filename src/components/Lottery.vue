@@ -2,7 +2,7 @@
   <div>
     <!-- prize-->
     <div class="container">
-      <div class="row col-sm-5 ">
+      <div class="row col-sm-12 " v-if="showTimeLeft">
         <div class="panel panel-info ">
           <div class="panel-heading  ">Prizes</div>
           <div class="panel-body ">
@@ -16,33 +16,45 @@
           </div>
         </div>
       </div>
-      <!-- Winners-->
-      <div class="row col-sm-5 col-sm-offset-2 ">
-        <div class="panel panel-info ">
-          <div class="panel-heading  ">Winners</div>
-          <div class="panel-body ">
-            <ol>
-              <li>prizeFirst</li>
-              <li>prizeSecond</li>
-              <li>prizeThird</li>
-              <li>prizeForth</li>
-              <li>prizeFifth</li>
-            </ol>
+      <div v-else>
+        <div class="row col-sm-5 ">
+          <div class="panel panel-info ">
+            <div class="panel-heading  ">Prizes</div>
+            <div class="panel-body ">
+              <ol>
+                <li>prizeFirst</li>
+                <li>prizeSecond</li>
+                <li>prizeThird</li>
+                <li>prizeForth</li>
+                <li>prizeFifth</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <!-- Winners-->
+        <div class="row col-sm-5 col-sm-offset-2 ">
+          <div class="panel panel-info ">
+            <div class="panel-heading  ">Winners</div>
+            <div class="panel-body">
+              <ol>
+                <li v-for="winner in winners">{{winner.wfid}}</li>
+              </ol>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!-- Timeleft-->
-    <div class="panel panel-info " v-if="showTimeLeft" >
-      <div class="panel-heading ">Time left: <span style="color:red" > {{caltimeLeft}} </span></div>
+    <div class="panel panel-info " v-if="showTimeLeft">
+      <div class="panel-heading ">Time left: <span style="color:red"> {{caltimeLeft}} </span></div>
     </div>
     <!-- Lucky Number-->
-    <div class="panel panel-info"  v-else>
+    <div class="panel panel-info" v-else>
       <div class="panel-heading ">Lottery lucky number: <span style="color:red"> 
-      <tr v-for="number in luckyNumber">
-            <td>{{number.luckyNumber}}</td>
-      </tr>
-      </span></div>
+        <tr v-for="number in luckyNumber">
+              <td>{{number.luckyNumber}}</td>
+        </tr>
+        </span></div>
     </div>
     <!--get start-->
     <div class="panel panel-default">
@@ -95,11 +107,13 @@
   let db = app.database()
   let lotteryRef = db.ref('lotteries')
   let luckyNumberRef = db.ref('luckyNumber')
+  let winnersRef = db.ref('winners')
   export default {
     name: 'app',
     firebase: {
       lotteries: lotteryRef,
-      luckyNumber:luckyNumberRef
+      luckyNumber: luckyNumberRef,
+      winners: winnersRef
     },
     data() {
       return {
@@ -110,11 +124,29 @@
         timeLeft: '',
         luckyNumber: 0,
         distance: 0,
-        showTimeLeft:true
+        showTimeLeft: true
       }
     },
     methods: {
       addLottery: function() {
+
+
+        
+        // lotteryRef.on('value', function(a) {
+        //   var lotteryObjs = a.val();
+        //   for (var key in lotteryObjs) {
+        //     if (lotteryObjs.hasOwnProperty(key)) {
+        //       console.log(lotteryObjs[key].wfid);
+        //       console.log(lotteryObjs[key].lotteryKey);
+        //     }
+        //   }
+        // });
+
+
+        if (!this.showTimeLeft) {
+          alert("Lottery event has already passed. Please come back early next time.")
+          return;
+        }
         var submitLottery = confirm("Please confirm your warframe Id. If the warframe Id is not correct, this lottery will not count!");
         if (submitLottery == true && this.newlotteryObj.wfid) {
           this.newlotteryObj.lotteryKey = Math.floor((Math.random() * 1000) + 1);
@@ -128,12 +160,18 @@
         lotteryRef.child(Lottery['.key']).remove()
         toastr.success('Lottery removed successfully')
       }
+      // getluckyList:function(){
+      //       firebase.database().ref('lotteries').on('value', function(lotteriesObj) {
+      //         temp=lotteriesObj.val();
+      //         console.log (temp)     
+      //       });       
+      // }
     },
     computed: {
       caltimeLeft: function() {
         var vm = this
         var left = ''
-        var countDownDate = new Date("June 29, 2017 18:00:00").getTime();
+        var countDownDate = new Date("June 30, 2017 04:15:00").getTime();
         var x = setInterval(function() {
           var now = new Date().getTime();
           this.distance = countDownDate - now;
@@ -141,21 +179,34 @@
           var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        //  console.log(this.distance)
-          if (this.distance >= 0){
+          //  console.log(this.distance)
+          if (this.distance >= 0) {
             vm.timeLeft = (days + "d " + hours + "h " + minutes + "m " + seconds + "s ")
-            vm.showTimeLeft=true
+            vm.showTimeLeft = true
+          } else {
+            vm.showTimeLeft = false
           }
-          else{
-          vm.showTimeLeft=false
-          }
-        }, 1000);    
+        }, 1000);
         return vm.timeLeft;
       },
     }
   }
-
-    //  luckyNumberRef.push({'luckyNumber':(Math.floor(Math.random() * 1000) + 1) })  
+  //  luckyNumberRef.push({'luckyNumber':(Math.floor(Math.random() * 1000) + 1) })  
+  function closest(num, arr) {
+    var curr = arr[0];
+    var diff = Math.abs(num - curr);
+    for (var val = 0; val < arr.length; val++) {
+      var newdiff = Math.abs(num - arr[val]);
+      if (newdiff < diff) {
+        diff = newdiff;
+        curr = arr[val];
+      }
+    }
+    return curr;
+  }
+  // array = [2, 42, 82, 122, 162, 202, 242, 282, 322, 362];
+  // number = 112;
+  // alert (closest (number, array));
 </script>
 
 <style>
