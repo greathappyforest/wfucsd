@@ -33,8 +33,16 @@
       </div>
     </div>
     <!-- Timeleft-->
-    <div class="panel panel-info ">
-      <div class="panel-heading ">Time left: <span style="color:red"> {{caltimeLeft}} </span></div>
+    <div class="panel panel-info " v-if="showTimeLeft" >
+      <div class="panel-heading ">Time left: <span style="color:red" > {{caltimeLeft}} </span></div>
+    </div>
+    <!-- Lucky Number-->
+    <div class="panel panel-info"  v-else>
+      <div class="panel-heading ">Lottery lucky number: <span style="color:red"> 
+      <tr v-for="number in luckyNumber">
+            <td>{{number.luckyNumber}}</td>
+      </tr>
+      </span></div>
     </div>
     <!--get start-->
     <div class="panel panel-default">
@@ -86,10 +94,12 @@
   let app = Firebase.initializeApp(config)
   let db = app.database()
   let lotteryRef = db.ref('lotteries')
+  let luckyNumberRef = db.ref('luckyNumber')
   export default {
     name: 'app',
     firebase: {
-      lotteries: lotteryRef
+      lotteries: lotteryRef,
+      luckyNumber:luckyNumberRef
     },
     data() {
       return {
@@ -97,13 +107,16 @@
           wfid: '',
           lotteryKey: ''
         },
-        timeLeft: ''
+        timeLeft: '',
+        luckyNumber: 0,
+        distance: 0,
+        showTimeLeft:true
       }
     },
     methods: {
       addLottery: function() {
         var submitLottery = confirm("Please confirm your warframe Id. If the warframe Id is not correct, this lottery will not count!");
-        if (submitLottery == true) {
+        if (submitLottery == true && this.newlotteryObj.wfid) {
           this.newlotteryObj.lotteryKey = Math.floor((Math.random() * 1000) + 1);
           lotteryRef.push(this.newlotteryObj);
           toastr.success('Lottery Added successfully')
@@ -120,24 +133,29 @@
       caltimeLeft: function() {
         var vm = this
         var left = ''
-        var countDownDate = new Date("june 30, 2018 04:41:25").getTime();
+        var countDownDate = new Date("June 29, 2017 18:00:00").getTime();
         var x = setInterval(function() {
           var now = new Date().getTime();
-          var distance = countDownDate - now;
+          this.distance = countDownDate - now;
           var days = Math.floor(distance / (1000 * 60 * 60 * 24));
           var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-          if(distance>0)
-          vm.timeLeft = (days + "d " + hours + "h " + minutes + "m " + seconds + "s ")
-          // vm.timeLeft = distance;
-        //  console.log(vm.timeLeft)
-        }, 1000);
+        //  console.log(this.distance)
+          if (this.distance >= 0){
+            vm.timeLeft = (days + "d " + hours + "h " + minutes + "m " + seconds + "s ")
+            vm.showTimeLeft=true
+          }
+          else{
+          vm.showTimeLeft=false
+          }
+        }, 1000);    
         return vm.timeLeft;
-      }
+      },
     }
   }
+
+    //  luckyNumberRef.push({'luckyNumber':(Math.floor(Math.random() * 1000) + 1) })  
 </script>
 
 <style>
@@ -145,3 +163,5 @@
     margin-right: 10px;
   }
 </style>
+
+
