@@ -51,10 +51,10 @@
     <!-- Lucky Number-->
     <div class="panel panel-info" v-else>
       <div class="panel-heading ">Lottery lucky number: <span style="color:red"> 
-        <tr v-for="number in luckyNumber">
-              <td>{{number.luckyNumber}}</td>
-        </tr>
-        </span></div>
+                <tr v-for="number in luckyNumber">
+                      <td>{{number.luckyNumber}}</td>
+                </tr>
+                </span></div>
     </div>
     <!--get start-->
     <div class="panel panel-default">
@@ -124,23 +124,64 @@
         timeLeft: '',
         luckyNumber: 0,
         distance: 0,
-        showTimeLeft: true
+        showTimeLeft: true,
+        prize1:'',
+        prize2:'',
+        prize3:'',
+        prize4:'',
+        prize5:''
+
+
       }
     },
     methods: {
       addLottery: function() {
 
 
-        
-        // lotteryRef.on('value', function(a) {
-        //   var lotteryObjs = a.val();
-        //   for (var key in lotteryObjs) {
-        //     if (lotteryObjs.hasOwnProperty(key)) {
-        //       console.log(lotteryObjs[key].wfid);
-        //       console.log(lotteryObjs[key].lotteryKey);
-        //     }
-        //   }
-        // });
+        var lucky = 0
+        luckyNumberRef.on('value', function(a) {
+          var luckyNumberObjs = a.val();
+          for (var key in luckyNumberObjs) {
+            if (luckyNumberObjs.hasOwnProperty(key))
+              lucky = luckyNumberObjs[key].luckyNumber
+          }
+        });
+        var result = []
+        var diff = 0
+        lotteryRef.on('value', function(a) {
+          var lotteryObjs = a.val();
+          for (var key in lotteryObjs) {
+            if (lotteryObjs.hasOwnProperty(key)) {
+              diff = Math.abs(lotteryObjs[key].lotteryKey - lucky);
+              lotteryRef.child(key).update({
+                'diff': diff
+              })
+            }
+          }
+          lotteryRef.orderByChild("diff").once("value", function(winnerList) {
+            winnerList.forEach(function(data) {
+              if (result.length < 5) {
+
+                result.push( {
+                'wfid':data.val().wfid,
+                'lotteryKey':data.val().lotteryKey,
+                'diff':data.val().diff 
+               } )
+                winnersRef.push( {
+                'wfid':data.val().wfid,
+                'lotteryKey':data.val().lotteryKey,
+                'diff':data.val().diff 
+               } )
+              }
+            })
+          })
+
+          console.log(result)
+          
+        });
+
+
+
 
 
         if (!this.showTimeLeft) {
@@ -160,18 +201,12 @@
         lotteryRef.child(Lottery['.key']).remove()
         toastr.success('Lottery removed successfully')
       }
-      // getluckyList:function(){
-      //       firebase.database().ref('lotteries').on('value', function(lotteriesObj) {
-      //         temp=lotteriesObj.val();
-      //         console.log (temp)     
-      //       });       
-      // }
     },
     computed: {
       caltimeLeft: function() {
         var vm = this
         var left = ''
-        var countDownDate = new Date("June 30, 2017 04:15:00").getTime();
+        var countDownDate = new Date("June 30, 2017 20:36:40").getTime();
         var x = setInterval(function() {
           var now = new Date().getTime();
           this.distance = countDownDate - now;
@@ -191,22 +226,6 @@
       },
     }
   }
-  //  luckyNumberRef.push({'luckyNumber':(Math.floor(Math.random() * 1000) + 1) })  
-  function closest(num, arr) {
-    var curr = arr[0];
-    var diff = Math.abs(num - curr);
-    for (var val = 0; val < arr.length; val++) {
-      var newdiff = Math.abs(num - arr[val]);
-      if (newdiff < diff) {
-        diff = newdiff;
-        curr = arr[val];
-      }
-    }
-    return curr;
-  }
-  // array = [2, 42, 82, 122, 162, 202, 242, 282, 322, 362];
-  // number = 112;
-  // alert (closest (number, array));
 </script>
 
 <style>
