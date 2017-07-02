@@ -20,12 +20,24 @@
    <div class="panel panel-default">
       <div class="panel-heading ">Get start</div>
       <div class="panel-body ">
-        <form id="form" class="input-group  col-sm-8 col-sm-offset-2 " v-on:submit.prevent="addItem">
-          <span class="input-group-addon" id="basic-addon1">@</span>
-          <div class="form-group ">
-            <input type="text" class="form-control" placeholder="warframe Id" v-model="newItemObj.wfid">
+        <form id="form" class="input-group col-sm-8 col-sm-offset-2  " v-on:submit.prevent="addItem">
+          
+          <div class="form-group col-sm-2">
+            <input type="text" class="form-control" placeholder="itemName" v-model="newItemObj.itemName">
           </div>
-          <span class="input-group-btn">  <input type="submit" class="btn btn-default" value="Go!"></span>
+          <div class="form-group col-sm-2">
+            <input type="text" class="form-control" placeholder="itemPrice" v-model="newItemObj.itemPrice">
+          </div>
+          <div class="form-group col-sm-2">
+            <input type="text" class="form-control" placeholder="Number" v-model="newItemObj.NumberOfItem">
+          </div>
+          <div class="form-group col-sm-2">
+            <input type="text" class="form-control" placeholder="wfid" v-model="newItemObj.wfid">
+          </div>
+          <div class="form-group col-sm-2">
+            <input type="text" class="form-control" placeholder="contact" v-model="newItemObj.contact">
+          </div>
+          <span class="input-group-btn col-sm-2">  <input type="submit" class="btn btn-default" value="Add"></span>
         </form>
       </div>
     </div>
