@@ -190,7 +190,7 @@
       },
       getLuckyNumber: function() {
         var num = Math.floor((Math.random() * 1000) + 1);
-        console.log(num)
+       // console.log(num)
         var luckyNumberdbSize = 0
         luckyNumberRef.once("value", function(snapshot) {
           luckyNumberdbSize = snapshot.numChildren();

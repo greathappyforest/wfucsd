@@ -1,5 +1,5 @@
 <template>
-   <div >
+  <div>
     <div class="container">
       <div class="row col-sm-12 ">
         <div class="panel panel-info ">
@@ -15,13 +15,16 @@
           </div>
         </div>
       </div>
+    </div>
+    <!--item input-->
+    <div class="panel panel-default">
+      <div class="panel-heading ">
+      Add a post
+       <span class="glyphicon glyphicon-chevron-down pull-right"></span>
       </div>
-  <!--item input-->
-   <div class="panel panel-default">
-      <div class="panel-heading ">Get start</div>
+        
       <div class="panel-body ">
-        <form id="form" class="input-group col-sm-8 col-sm-offset-2  " v-on:submit.prevent="addItem">
-          
+        <form id="form" class="input-group col-md-8 col-md-offset-2  " v-on:submit.prevent="addItem">
           <div class="form-group col-sm-2">
             <input type="text" class="form-control" placeholder="itemName" v-model="newItemObj.itemName">
           </div>
@@ -37,39 +40,36 @@
           <div class="form-group col-sm-2">
             <input type="text" class="form-control" placeholder="contact" v-model="newItemObj.contact">
           </div>
-          <span class="input-group-btn col-sm-2">  <input type="submit" class="btn btn-default" value="Add"></span>
+          <span class="input-group-btn col-sm-2">  <input type="submit" class="btn btn-primary" value="Add"></span>
         </form>
       </div>
     </div>
-
-
     <!--item list-->
- <div class="panel panel-default">
+    <div class="panel panel-default">
       <div class="panel-heading">Participators list</div>
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>warframe Id</th>
-            <th>Lottery Number</th>
-            <th>Difference</th>
+            <th>Item Name</th>
+            <th>Item Price</th>
+            <th>Item Number</th>
+            <th>warfarme Id</th>
+            <th>Contact</th>
           </tr>
         </thead>
-        
         <tbody>
           <tr v-for="item in marketplacedb">
-            <td>item.itemName</td>
-            <td>item.itemPrice</td>
-            <td>item.NumberOfItem</td>
-            <td>item.wfid</td>
-            <td>item.contact</td>
-             <td><span class="glyphicon glyphicon-trash" aria-hidden="true" v-on:click="removeItem(item)"></span></td>
+            <td>{{item.itemName}}</td>
+            <td>{{item.itemPrice}}</td>
+            <td>{{item.NumberOfItem}}</td>
+            <td>{{item.wfid}}</td>
+            <td>{{item.contact}}</td>
+            <td><span class="glyphicon glyphicon-trash" aria-hidden="true" v-on:click="removeItem(item)"></span></td>
           </tr>
         </tbody>
       </table>
     </div>
-
-
-</div>
+  </div>
 </template>
 
 
@@ -77,8 +77,9 @@
 <script>
   import Firebase from 'firebase'
   import toastr from 'toastr'
-  import { database } from '../../static/firebase.config.js'
-
+  import {
+    database
+  } from '../../static/firebase.config.js'
   let marketplacedbRef = database.ref('marketplacedb')
   export default {
     name: 'MarketPlace',
@@ -90,24 +91,31 @@
         newItemObj: {
           wfid: '',
           itemName: '',
-          NumberOfItem:'',
-          itemPrice:'',
-          contact:''
+          NumberOfItem: '',
+          itemPrice: '',
+          contact: ''
         }
       }
     },
     methods: {
       addItem: function() {
-        var submitItem = confirm("Please confirm your warframe Id. If the warframe Id is not correct, this lottery will not count!");
-     //   if (submitItem == true && this.newItemObj.wfid && this.newItemObj.itemName && this.newItemObj.itemPrice && this.newItemObj.contact) {
-          marketplacedbRef.push(this.newItemObj);
-          toastr.success('Item post successfully')
-          this.newItemObj.itemName = '';
-          this.newItemObj.itemPrice = '';
-          this.newItemObj.NumberOfItem = '';
-          this.newItemObj.wfid = '';
-          this.newItemObj.contact = '';
-      //  }
+        if (this.newItemObj.itemName && this.newItemObj.itemPrice && (this.newItemObj.wfid || this.newItemObj.contact)) {
+          if(!this.newItemObj.NumberOfItem){
+             this.newItemObj.NumberOfItem = '1'
+          }
+          var submitItem = confirm("Please confirm your post: \n"+ "itemName: "+this.newItemObj.itemName +"\n"
+          + "itemPrice: "+this.newItemObj.itemPrice +"\n"+ "NumberOfItem: "+this.newItemObj.NumberOfItem +"\n"+ "wfid: "+this.newItemObj.wfid
+           +"\n"+ "contact: "+this.newItemObj.contact +"\n");
+          if (submitItem == true) {
+            marketplacedbRef.push(this.newItemObj);
+            toastr.success('Item post successfully')
+            this.newItemObj.itemName = '';
+            this.newItemObj.itemPrice = '';
+            this.newItemObj.NumberOfItem = '';
+            this.newItemObj.wfid = '';
+            this.newItemObj.contact = '';
+          }
+        }
       },
       removeItem: function(Item) {
         marketplacedbRef.child(Item['.key']).remove()
