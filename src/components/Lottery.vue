@@ -89,7 +89,6 @@
             <td><span class="glyphicon glyphicon-trash" aria-hidden="true" v-on:click="removeLottery(lottery)"></span></td>
             -->
             <td><span >{{lottery.diff}}</span></td>
-            
           </tr>
         </tbody>
       </table>
@@ -98,23 +97,16 @@
 </template>
 
 <script>
-  import Firebase from 'firebase'
+
   import toastr from 'toastr'
-  let config = {
-    apiKey: "AIzaSyDxUiUJpcQ8gLAjpJWXTQa9qov712j58m0",
-    authDomain: "wfucsd.firebaseapp.com",
-    databaseURL: "https://wfucsd.firebaseio.com",
-    projectId: "wfucsd",
-    storageBucket: "wfucsd.appspot.com",
-    messagingSenderId: "111487561397"
-  };
-  let app = Firebase.initializeApp(config)
-  let db = app.database()
-  let lotteryRef = db.ref('lotteries')
-  let luckyNumberRef = db.ref('luckyNumber')
-  let winnersRef = db.ref('winners')
+  import lotterydata from '../../static/lotterydata.json'
+  import { database } from '../../static/firebase.config.js'
+
+  let lotteryRef = database.ref('lotteries')
+  let luckyNumberRef = database.ref('luckyNumber')
+  let winnersRef = database.ref('winners')
   export default {
-    name: 'app',
+    name: 'Lottery',
     firebase: {
       lotteries: lotteryRef,
       luckyNumber: luckyNumberRef,
@@ -122,16 +114,17 @@
     },
     data() {
       return {
+       lotterydata:lotterydata,
         newlotteryObj: {
           wfid: '',
           lotteryKey: ''
         },
-        eventEndTime: "July 1, 2017 03:44:40",
-        prize1: 'prize1',
-        prize2: 'prize2',
-        prize3: 'prize3',
-        prize4: 'prize4',
-        prize5: 'prize5',
+        eventEndTime: lotterydata.eventEndTime,
+        prize1: lotterydata.prize1,
+        prize2: lotterydata.prize2,
+        prize3: lotterydata.prize3,
+        prize4: lotterydata.prize4,
+        prize5: lotterydata.prize5,
         timeLeft: '',
         luckyNumber: 0,
         distance: 0,
