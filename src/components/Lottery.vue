@@ -97,7 +97,6 @@
 </template>
 
 <script>
-
   import toastr from 'toastr'
   import lotterydata from '../../static/lotterydata.json'
   import { database } from '../../static/firebase.config.js'
@@ -112,9 +111,9 @@
       luckyNumber: luckyNumberRef,
       winners: winnersRef
     },
-    data() {
+    data () {
       return {
-       lotterydata:lotterydata,
+        lotterydata,
         newlotteryObj: {
           wfid: '',
           lotteryKey: ''
@@ -132,51 +131,52 @@
       }
     },
     methods: {
-      addLottery: function() {
+      addLottery: function () {
         if (!this.showTimeLeft) {
-          alert("Lottery event has already passed. Please come back early next time.")
-          return;
+          alert('Lottery event has already passed. Please come back early next time.')
+          return
         }
-        var submitLottery = confirm("Please confirm your warframe Id. If the warframe Id is not correct, this lottery will not count!");
-        if (submitLottery == true && this.newlotteryObj.wfid) {
-          this.newlotteryObj.lotteryKey = Math.floor((Math.random() * 1000) + 1);
-          lotteryRef.push(this.newlotteryObj);
+        var submitLottery = confirm('Please confirm your warframe Id. If the warframe Id is not correct, this lottery will not count!')
+        if (submitLottery === true && this.newlotteryObj.wfid) {
+          this.newlotteryObj.lotteryKey = Math.floor((Math.random() * 1000) + 1)
+          lotteryRef.push(this.newlotteryObj)
           toastr.success('Lottery Added successfully')
-          this.newlotteryObj.wfid = '';
+          this.newlotteryObj.wfid = ''
           this.newlotteryObj.lotteryKey = ''
         }
       },
-      removeLottery: function(Lottery) {
+      removeLottery: function (Lottery) {
         lotteryRef.child(Lottery['.key']).remove()
         toastr.success('Lottery removed successfully')
       },
-      getWinner: function() {
+      getWinner: function () {
         var lucky = 0
-        luckyNumberRef.on('value', function(a) {
-          var luckyNumberObjs = a.val();
+        luckyNumberRef.on('value', function (a) {
+          var luckyNumberObjs = a.val()
           for (var key in luckyNumberObjs) {
-            if (luckyNumberObjs.hasOwnProperty(key))
+            if (luckyNumberObjs.hasOwnProperty(key)) {
               lucky = luckyNumberObjs[key].luckyNumber
+            }
           }
-        });
+        })
         var diff = 0
-        lotteryRef.on('value', function(a) {
-          var lotteryObjs = a.val();
+        lotteryRef.on('value', function (a) {
+          var lotteryObjs = a.val()
           for (var key in lotteryObjs) {
             if (lotteryObjs.hasOwnProperty(key)) {
-              diff = Math.abs(lotteryObjs[key].lotteryKey - lucky);
+              diff = Math.abs(lotteryObjs[key].lotteryKey - lucky)
               lotteryRef.child(key).update({
                 'diff': diff
               })
             }
           }
-          //get winner size
+          //  get winner size
           var winnersSize = 0
-          winnersRef.once("value", function(snapshot) {
-            winnersSize = snapshot.numChildren();
-          });
-          lotteryRef.orderByChild("diff").once("value", function(winnerList) {
-            winnerList.forEach(function(data) {
+          winnersRef.once('value', function (snapshot) {
+            winnersSize = snapshot.numChildren()
+          })
+          lotteryRef.orderByChild('diff').once('value', function (winnerList) {
+            winnerList.forEach(function (data) {
               if (winnersSize < 5) {
                 winnersRef.push({
                   'wfid': data.val().wfid,
@@ -186,46 +186,45 @@
               }
             })
           })
-        });
+        })
       },
-      getLuckyNumber: function() {
-        var num = Math.floor((Math.random() * 1000) + 1);
-       // console.log(num)
+      getLuckyNumber: function () {
+        var num = Math.floor((Math.random() * 1000) + 1)
+        // console.log(num)
         var luckyNumberdbSize = 0
-        luckyNumberRef.once("value", function(snapshot) {
-          luckyNumberdbSize = snapshot.numChildren();
-        });
-        if (luckyNumberdbSize == 0) {
-          luckyNumberRef.push({'luckyNumber':num})
+        luckyNumberRef.once('value', function (snapshot) {
+          luckyNumberdbSize = snapshot.numChildren()
+        })
+        if (luckyNumberdbSize === 0) {
+          luckyNumberRef.push({'luckyNumber': num})
         }
       }
     },
     computed: {
-      caltimeLeft: function() {
+      caltimeLeft: function () {
         var vm = this
-        var left = ''
-        var countDownDate = new Date(this.eventEndTime).getTime();
-        var x = setInterval(function() {
-          var now = new Date().getTime();
-          this.distance = countDownDate - now;
-          var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-          var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-          var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        var countDownDate = new Date(this.eventEndTime).getTime()
+        setInterval(function () {
+          var now = new Date().getTime()
+          this.distance = countDownDate - now
+          var days = Math.floor(this.distance / (1000 * 60 * 60 * 24))
+          var hours = Math.floor((this.distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+          var minutes = Math.floor((this.distance % (1000 * 60 * 60)) / (1000 * 60))
+          var seconds = Math.floor((this.distance % (1000 * 60)) / 1000)
           //  console.log(this.distance)
           if (this.distance >= 0) {
-            vm.timeLeft = (days + "d " + hours + "h " + minutes + "m " + seconds + "s ")
+            vm.timeLeft = (days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's ')
             vm.showTimeLeft = true
           } else {
             vm.showTimeLeft = false
           }
-        }, 1000);
-        return vm.timeLeft;
-      },
+        }, 1000)
+        return vm.timeLeft
+      }
     },
     watch: {
       showTimeLeft: {
-        handler: function() {
+        handler: function () {
           this.getLuckyNumber()
           this.getWinner()
         }

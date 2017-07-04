@@ -15,7 +15,7 @@ export default {
   name: 'Home',
   data () {
     return {
-     
+
     }
   }
 }
@@ -25,3 +25,5 @@ export default {
 <style scoped>
 
 </style>
+
+

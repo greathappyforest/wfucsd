@@ -75,7 +75,6 @@
 
 
 <script>
-  import Firebase from 'firebase'
   import toastr from 'toastr'
   import {
     database
@@ -84,9 +83,9 @@
   export default {
     name: 'MarketPlace',
     firebase: {
-      marketplacedb: marketplacedbRef,
+      marketplacedb: marketplacedbRef
     },
-    data() {
+    data () {
       return {
         newItemObj: {
           wfid: '',
@@ -98,26 +97,26 @@
       }
     },
     methods: {
-      addItem: function() {
+      addItem: function () {
         if (this.newItemObj.itemName && this.newItemObj.itemPrice && (this.newItemObj.wfid || this.newItemObj.contact)) {
-          if(!this.newItemObj.NumberOfItem){
-             this.newItemObj.NumberOfItem = '1'
+          if (!this.newItemObj.NumberOfItem) {
+            this.newItemObj.NumberOfItem = '1'
           }
-          var submitItem = confirm("Please confirm your post: \n"+ "itemName: "+this.newItemObj.itemName +"\n"
-          + "itemPrice: "+this.newItemObj.itemPrice +"\n"+ "NumberOfItem: "+this.newItemObj.NumberOfItem +"\n"+ "wfid: "+this.newItemObj.wfid
-           +"\n"+ "contact: "+this.newItemObj.contact +"\n");
-          if (submitItem == true) {
-            marketplacedbRef.push(this.newItemObj);
+          var submitItem = confirm('Please confirm your post: \n' + 'itemName: ' + this.newItemObj.itemName + '\n' +
+        'itemPrice: ' + this.newItemObj.itemPrice + '\n' + 'NumberOfItem: ' + this.newItemObj.NumberOfItem + '\n' + 'wfid: ' + this.newItemObj.wfid +
+           '\n' + 'contact: ' + this.newItemObj.contact + '\n')
+          if (submitItem === true) {
+            marketplacedbRef.push(this.newItemObj)
             toastr.success('Item post successfully')
-            this.newItemObj.itemName = '';
-            this.newItemObj.itemPrice = '';
-            this.newItemObj.NumberOfItem = '';
-            this.newItemObj.wfid = '';
-            this.newItemObj.contact = '';
+            this.newItemObj.itemName = ''
+            this.newItemObj.itemPrice = ''
+            this.newItemObj.NumberOfItem = ''
+            this.newItemObj.wfid = ''
+            this.newItemObj.contact = ''
           }
         }
       },
-      removeItem: function(Item) {
+      removeItem: function (Item) {
         marketplacedbRef.child(Item['.key']).remove()
         toastr.success('Item removed successfully')
       }

@@ -10,6 +10,12 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-config-volox": "^2.1.1",
+    "eslint-plugin-import": "^2.6.1",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-standard": "^3.0.1",
     "firebase": "^4.1.3",
     "jquery": "^3.2.1",
     "toastr": "^2.1.2",
@@ -29,6 +35,7 @@
     "connect-history-api-fallback": "^1.3.0",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
+    "eslint-plugin-html": "^3.0.0",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.14.1",
     "extract-text-webpack-plugin": "^2.0.0",
